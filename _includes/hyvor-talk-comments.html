@@ -1,9 +1,19 @@
 <div id="hyvor-talk-view"></div>
 <script type="text/javascript">
-    var HYVOR_TALK_WEBSITE = 5548;
+    var HYVOR_TALK_WEBSITE = '{{5548 }}'; // DO NOT CHANGE THIS
     var HYVOR_TALK_CONFIG = {
-        url: false,
-        id: false
+        url: '{{ page.url | absolute_url }}',
+        id: '{{page.id}}',
+        palette: {
+            accent: "#86bb48",
+            accentText: "#080808",
+            footerHeader: "#171616",
+            footerHeaderText: "#656363",
+            box: "#3A3A38",
+            boxText: "#E0E0E0",
+            boxLightText: "#AAAAAA",
+            backgroundText: "#E0E0E0"
+        }
     };
 </script>
-<script async type="text/javascript" src="//talk.hyvor.com/web-api/embed.js"></script>
+<script async type="text/javascript" src="//talk.hyvor.com/web-api/embed"></script>
