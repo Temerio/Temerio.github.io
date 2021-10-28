@@ -169,9 +169,9 @@ User lin may run the following commands on bountyhacker:
 Ahora sabemos que el usuario lin tiene permiso para ejecutar **/bin/tar** como root, esto podría ser de gran ayuda para escalar privilegios.
 
 Mi primer lugar es ir siempre a https://gtfobins.github.io/ para buscar posibles comandos para escalar privilegios mediante un binario específico con permisos especiales.
-![GTFObins](https://imgur.com/E6CUX9H)
+![GTFObins](https://i.imgur.com/Oh6qmye.png)
 Busque **tar** en la barra de búsqueda y haga clic en la misma, desplácese hacia abajo hasta SUDO.
-![GTFObinsudo](https://imgur.com/Zu8aHVo)
+![GTFObinsudo](https://i.imgur.com/1gqBJ48.png)
 
 Siempre debes leer la descripción. Se ve bastante bien para mí, no puedo resistirme a ejecutarlo y obtener root. Vamos a ver. Dedos cruzados..
 ```bash
