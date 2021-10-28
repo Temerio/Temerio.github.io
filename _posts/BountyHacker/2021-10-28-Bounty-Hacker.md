@@ -25,7 +25,7 @@ PORT   STATE SERVICE
 Nmap done: 1 IP address (1 host up) scanned in 127.96 seconds
 ```
 Vemos 3 puertos abiertos y nos conectamos al sitio web(Port 80)
-![WebPage](https://imgur.com/swkGsAb)
+![WebPage](https://i.imgur.com/swkGsAb.png?1)
 Al no encontrar nada probamos con el siguiente puerto FTP (Port 21) e intentamos loguearnos como "Anonymous".
 ```bash
 ┌──(temerio㉿Hackademy)-[~/Desktop/Thm/BountyHacker]
