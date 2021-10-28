@@ -5,7 +5,8 @@ description : "TryHackMe easy machine."
 ---
 ![Bounty Hacker](https://i.imgur.com/qodkcem.jpg)
 *You talked a big game about being the most elite hacker in the solar system. Prove it and claim your right to the status of Elite Bounty Hacker!*
-[room]: (https://tryhackme.com/room/cowboyhacker) 
+
+[room](https://tryhackme.com/room/cowboyhacker) 
 
 ## Reconnaissance
 
