@@ -7,7 +7,7 @@ author: Temerio
 
 Puedes encontrar la Room [aquí](https://tryhackme.com/room/cowboyhacker) 
 
-## Reconnaissance
+### Enumeration
 
 ```bash
 ┌──(temerio㉿Hackademy)-[~]
@@ -105,6 +105,7 @@ rEDdrAGOnSyNDiCat3
 r3ddr@g0N
 ReDSynd1ca7e
 ```
+### Bruteforce
 Todo esto se parece a un diccionario de fuerza bruta, usaremos *Hydra* para intentar acceder al sistema.
 ```bash
 ┌──(temerio㉿Hackademy)-[~/Desktop/Thm/BountyHacker]
@@ -155,6 +156,7 @@ Encontramos la Flag del USER.
 lin@bountyhacker:~/Desktop$ cat user.txt 
 THM{UserFlag}
 ```
+### Privilege Escalation
 Lo que ahora queda es encontrar una manera de escalar nuestros privilegios para convertirnos en root y eventualmente conseguir la flag de root.
 ```bash
 lin@bountyhacker:~/Desktop$ sudo -l
