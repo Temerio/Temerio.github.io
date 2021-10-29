@@ -6,6 +6,7 @@ author: Temerio
 *You talked a big game about being the most elite hacker in the solar system. Prove it and claim your right to the status of Elite Bounty Hacker!*
 
 Puedes encontrar la Room [aquí](https://tryhackme.com/room/cowboyhacker) 
+___
 
 ### Enumeration
 
@@ -187,3 +188,7 @@ Tengo una última cosa que hacer y hemos terminado.. Necesitamos obtener la Flag
 ```bash
 cat /root/root.txt
 THM{RootFlag}
+```
+___
+Eso es todo por esta room, espero que te haya gustado y mantente siempre en #HackMode!
+*.-Temerio*
