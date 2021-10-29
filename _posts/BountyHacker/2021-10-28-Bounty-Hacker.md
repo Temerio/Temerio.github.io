@@ -1,9 +1,8 @@
 ---
 layout: post
 author: Temerio
-cover: "Bounty.jpeg"
+cover: "cover.jpeg"
 useRelativeCover : true
-tags : ["TryHackMe"]
 ---
 ![Bounty Hacker](https://i.imgur.com/qodkcem.jpg)
 *You talked a big game about being the most elite hacker in the solar system. Prove it and claim your right to the status of Elite Bounty Hacker!*
