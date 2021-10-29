@@ -46,9 +46,9 @@ ftp> ls
 -rw-rw-r--    1 ftp      ftp            68 Jun 07  2020 task.txt
 226 Directory send OK.
 ```
-El File Transfer Protocol (FTP) contiene 2 archivos.
--locks.txt
--task.txt
+El File Transfer Protocol (FTP) contiene 2 archivos:
+- locks.txt
+- task.txt
 
 Procedemos a descargarlo mediante el comando "get".
 ```bash
