@@ -47,8 +47,8 @@ ftp> ls
 226 Directory send OK.
 ```
 El File Transfer Protocol (FTP) contiene 2 archivos llamados:
-*locks.txt
-*task.txt
+-locks.txt
+-task.txt
 
 Procedemos a descargarlo mediante el comando "get".
 ```bash
@@ -74,7 +74,7 @@ Una vez descargados los archivos procedemos a visualizarlo en nuestra terminal m
 
 -lin
 ```
-Podemos visualizar un nombre en este archivo llamado "lin" este nos puede servir más adelante, continuemos con el siguiente archivo.
+Podemos visualizar un nombre en este archivo llamado *lin* este nos puede servir más adelante, continuemos con el siguiente archivo.
 ```bash
 ┌──(temerio㉿Hackademy)-[~/Desktop/Thm/BountyHacker]
 └─$ cat locks.txt       
@@ -105,7 +105,7 @@ rEDdrAGOnSyNDiCat3
 r3ddr@g0N
 ReDSynd1ca7e
 ```
-Todo esto se parece a un diccionario de fuerza bruta, usaremos 'Hydra' para intentar acceder al sistema.
+Todo esto se parece a un diccionario de fuerza bruta, usaremos *Hydra* para intentar acceder al sistema.
 ```bash
 ┌──(temerio㉿Hackademy)-[~/Desktop/Thm/BountyHacker]
 └─$ hydra -l lin -P /home/temerio/Desktop/Thm/BountyHacker/locks.txt 10.10.107.126 -t 4 ssh
