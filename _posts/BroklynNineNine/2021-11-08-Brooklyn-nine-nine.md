@@ -2,7 +2,7 @@
 layout: post
 author: Temerio
 ---
-
+![](https://i.imgur.com/wXKrQUO.png)
 ```bash
 sudo nmap -p- -sSC --min-rate 5000 --open -vvv -n -Pn 10.10.241.206
 ```
